@@ -1,0 +1,59 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+  # 允许手动从 GitHub Actions 界面运行此工作流
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  # Job 1: 构建项目并上传 artifact
+  build-and-deploy:
+    # 判断当前仓库是否为模板仓库
+    if: ${{ github.repository != 'sjtdev-frontend-mentor/vue-tailwind-template' }}
+    runs-on: ubuntu-latest
+    # 声明使用GitHub Pages环境
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: './package-lock.json'
+
+      - name: Install dependencies
+        working-directory: .
+        run: npm ci
+
+      - name: Build project
+        working-directory: .
+        run: npm run build
+
+      # 使用官方推荐部署流程
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+      # 使用官方部署（替换peaceiris方案）
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,7 @@
+/* 在CSS文件中添加 */
+@font-face {
+  font-family: 'Public Sans';
+  src: url('./fonts/PublicSans-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 100 900; /* 可变字重范围 */
+  font-style: normal;
+}
